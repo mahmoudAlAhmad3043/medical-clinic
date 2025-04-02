@@ -1,4 +1,4 @@
-import  Role  from './role'
+import  {Role}  from '../types'
 export default class User {
     user_id:number;
     first_name:string;

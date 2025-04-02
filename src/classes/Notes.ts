@@ -1,10 +1,10 @@
+import mongoose from "mongoose"
+
 class Notes {
-    id:number
-    patient_id:number
+    patient_id:mongoose.Types.ObjectId
     description:string
 
-    constructor(id:number,patient_id:number,description:string){
-        this.id = id
+    constructor(patient_id:mongoose.Types.ObjectId,description:string){
         this.patient_id = patient_id
         this.description = description
     }

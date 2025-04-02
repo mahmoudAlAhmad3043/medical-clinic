@@ -1,22 +1,20 @@
-import BookingType from './bookingType'
-import Status from './status'
-import Time from './time'
+import mongoose from 'mongoose'
+import {Status} from '../types'
+import {Time} from '../types'
 
 class Booking {
-    id: number
     date:Date
     time:Time
-    patient_id:number
-    booking_type:BookingType
+    patient_id:mongoose.Schema.Types.ObjectId
+    service_id:mongoose.Schema.Types.ObjectId
     booking_code:string
     status:Status
   
-    constructor(id:number,date:Date,time:Time,patient_id:number,booking_type:BookingType,booking_code:string,status:Status){
-      this.id = id;
+    constructor(date:Date,time:Time,patient_id:mongoose.Schema.Types.ObjectId,service_id:mongoose.Schema.Types.ObjectId,booking_code:string,status:Status){
       this.date = date;
       this.time = time;
       this.patient_id = patient_id;
-      this.booking_type = booking_type;
+      this.service_id = service_id;
       this.booking_code = booking_code;
       this.status = status
     }
