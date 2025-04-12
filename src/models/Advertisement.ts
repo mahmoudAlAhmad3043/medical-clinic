@@ -3,8 +3,8 @@ import mongoose from "../config/db";
 
 
 const AdvertisementSchema = new mongoose.Schema<Advertisement>({
-    description:String,
-    path_image:String
+    description:{type:String,required:true},
+    path_image:{type:String,required:false}
 })
 
 

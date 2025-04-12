@@ -1,9 +1,12 @@
 import express from 'express'
 import AdminCtrl from '../controllers/AdminCtrl'
-const singInRouter = express.Router()
+const singUpRouter = express.Router()
 const logInRouter = express.Router()
+const getAdminRouter = express.Router()
 
-singInRouter.post('/',(req,res) => AdminCtrl.signIn(req,res))
+singUpRouter.post('/',(req,res) => AdminCtrl.signUp(req,res))
 logInRouter.post('/',(req,res) => AdminCtrl.logIn(req,res))
+getAdminRouter.get('/',(req,res) => AdminCtrl.getAdmin(req,res))
 
-export default {singInRouter, logInRouter}
+
+export default {singUpRouter, logInRouter , getAdminRouter}
