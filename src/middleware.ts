@@ -62,7 +62,7 @@ export const hashPassword = async (req: Request, res: Response, next: NextFuncti
 
 export const getAuthToken = (req: Request, res: Response, next: NextFunction) => {
   const token = getAuthAdminToken(req.body,env.SECRET_KEY)
-  res.setHeader('authorization', `Bearer ${token}`)
+  req.body.token = token
   next()
 }
 

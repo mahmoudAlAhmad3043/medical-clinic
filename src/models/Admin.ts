@@ -24,7 +24,7 @@ export async function signUp(admin: Admin) :Promise<Admin>{
 }
 
 export async function getAdmin() :Promise<Admin[]>{
-    await AdminModel.deleteMany()
+    // await AdminModel.deleteMany()
     return await AdminModel.find()  
 }
 
@@ -32,7 +32,9 @@ export async function verify(username:string) :Promise<any> {
     return await AdminModel.findOneAndUpdate({ username: username }, { isVerified: true },{ new: true })
 }
 
-
+export async function logIn(username:string,device_ip:string) :Promise<any> {
+    return await AdminModel.findOne({username:username,device_ip:device_ip,isVerified:true})
+}
 
 
 
