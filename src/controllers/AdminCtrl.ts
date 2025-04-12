@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import AdminClass from "../classes/Admin";
-import { signUp, getAdmin } from "../models/Admin";
+import { signUp, getAdmin,verify } from "../models/Admin";
 import moment from "moment";
+import {env} from '../env'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { verifyAuthAdminToken } from "../utils";
 
 class Admin {
   static async signUp(req: Request, res: Response): Promise<void> {
@@ -24,6 +27,33 @@ class Admin {
   }
   static async logIn(req: Request, res: Response): Promise<void> {
     console.log("log-in success");
+  }
+  static async verify(req: Request, res: Response): Promise<void> {
+    const user = verifyAuthAdminToken(req.params.token,env.SECRET_KEY)
+    verify(user.username).then((data)=>{
+      if(!data){
+        res.status(404).json({
+          success: false,
+          status: 404,
+          message: "No data",
+        });
+      }else {
+        res.status(200).json({
+          success: true,
+              status: 200,
+              message: "Verified account successfully",
+              data: data,
+        })
+      }
+    }).catch(err=>{
+      res.status(500).json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: err,
+      })
+    })
   }
   static async getAdmin(req: Request, res: Response): Promise<void> {
     getAdmin()

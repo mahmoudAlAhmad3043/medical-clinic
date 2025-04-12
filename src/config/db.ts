@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
-
-mongoose.connect('mongodb://127.0.0.1:27017/medical_clinic_db')
+import { env } from './../env'
+mongoose.connect(env.MONGO_URI)
 .then(()=>{
     console.log('database connected')
 })

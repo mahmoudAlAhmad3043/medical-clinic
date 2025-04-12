@@ -3,11 +3,12 @@ import { getAdmin } from "./models/Admin";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { env }  from './env'
-
+import nodemailer from 'nodemailer'
+import { getAuthAdminToken } from "./utils";
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   const admin = req.body;
-  if (typeof admin === "object" && admin.password && admin.first_name && admin.device_ip) {
+  if (typeof admin === "object" && admin.password && admin.username && admin.device_ip) {
     next();
   } else{
     res.status(403).json({
@@ -60,9 +61,34 @@ export const hashPassword = async (req: Request, res: Response, next: NextFuncti
 }
 
 export const getAuthToken = (req: Request, res: Response, next: NextFunction) => {
-  const secret = env.SECRET_KEY
-  const admin =  req.body  
-  const token = jwt.sign({first_name:admin.first_name,device_ip:admin.device_ip},secret)
+  const token = getAuthAdminToken(req.body,env.SECRET_KEY)
   res.setHeader('authorization', `Bearer ${token}`)
+  next()
+}
+
+export const sendVerificationEmail = (req: Request, res: Response, next: NextFunction) => {
+  const admin =  req.body
+  admin.isVerified = false
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: env.EMAIL_USER,
+      pass: env.EMAIL_PASS
+    }
+  });
+  const token = getAuthAdminToken(req.body,env.SECRET_KEY)
+  const url = `http://${env.IP}:${env.PORT}/verify/${token}`;
+  console.log(admin.email)
+  const mailOptions = {
+    from: env.EMAIL_USER,
+    to: admin.email,
+    subject: "Email Verification",
+    html: `<h3>Click to verify your email:</h3><a href="${url}">${url}</a>`
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) console.error("Email error:", error);
+    else console.log("Email sent:", info.response);
+  });
   next()
 }
