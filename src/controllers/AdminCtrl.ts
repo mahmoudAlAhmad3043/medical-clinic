@@ -1,20 +1,26 @@
 import { Request, Response } from "express";
 import AdminClass from "../classes/Admin";
-import { signUp, getAdmin,verify,logIn } from "../models/Admin";
-import moment from "moment";
 import {env} from '../env'
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import { comparePassword, verifyAuthAdminToken } from "../utils";
+import { comparePassword, verifyAuthAdminToken, sendVerificationEmail } from "../utils";
 
 class Admin {
   static async signUp(req: Request, res: Response): Promise<void> {
-    signUp(req.body).then((data)=>{
-      res.status(201).json({
-        success: true,
-        status: 201,
-        message: "Registerd successfully",
-        data: '',
-      });
+    AdminClass.setAdmin(req.body).then((data)=>{
+      if(!data) {
+        res.status(404).json({
+          success: false,
+          status: 404,
+          message: "Admin already exists",
+        });
+      } else {
+        sendVerificationEmail(res.locals.token,req.body.email)
+        res.status(201).json({
+          success: true,
+          status: 201,
+          message: "Registerd successfully",
+          data: '',
+        });
+      }
     }).catch(err=>{
       res.json({
         success: false,
@@ -27,7 +33,8 @@ class Admin {
   }
   static async logIn(req: Request, res: Response): Promise<void> {
     const user = req.body
-    logIn(user.username,user.device_ip).then(async (data)=>{
+    const token = res.locals.token
+    AdminClass.getAdmin(user.username,user.device_ip).then(async (data)=>{
       if(!data) {
         res.status(404).json({
           success: false,
@@ -35,9 +42,8 @@ class Admin {
           message: "username or password incorrect",
         });
       } else {
-        const hashedPassword = data.password
-        if(await comparePassword(user.password,hashedPassword)) {
-          res.setHeader('authorization', `Bearer ${user.token}`)
+        if(await comparePassword(user.password,data.password)) {
+          res.setHeader('authorization', `Bearer ${token}`)
           res.status(200).json({
                 success: true,
                 status: 200,
@@ -63,8 +69,15 @@ class Admin {
     })
   }
   static async verify(req: Request, res: Response): Promise<void> {
-    const user = verifyAuthAdminToken(req.params.token,env.SECRET_KEY)
-    verify(user.username).then((data)=>{
+    const data = verifyAuthAdminToken(req.params.token,env.SECRET_KEY)
+    if(!data.status) {
+      res.status(404).json({
+        success: false,
+        status: 404,
+        message: "No data",
+      });
+    }
+    AdminClass.verify(data.decoded.username).then((data)=>{
       if(!data){
         res.status(404).json({
           success: false,
@@ -76,7 +89,7 @@ class Admin {
           success: true,
               status: 200,
               message: "Verified account successfully",
-              data: data,
+              data: '',
         })
       }
     }).catch(err=>{
@@ -89,33 +102,33 @@ class Admin {
       })
     })
   }
-  static async getAdmin(req: Request, res: Response): Promise<void> {
-    getAdmin()
-      .then((data) => {
-        if (!data.length) {
-          res.status(404).json({
-            success: false,
-            status: 404,
-            message: "No data",
-          });
-        } else {
-            res.status(200).json({
-            success: true,
-            status: 200,
-            message: "Admins retrieved successfully",
-            data: data,
-          });
-        }
-      })
-      .catch((err) => {
-        res.json({
+
+  static async deleteAdmin(req: Request, res: Response): Promise<void> {
+    let data = res.locals.authData
+    AdminClass.deleteAdmin(data.decoded.username,data.decoded.device_ip).then(data=>{
+      if(!data.deletedCount){
+        res.status(404).json({
           success: false,
-          status: 500,
-          message: "Something went wrong",
-          data: [],
-          error: err,
+          status: 404,
+          message: "Delete failed",
         });
+      } else {
+        res.status(200).json({
+          success: true,
+          status: 200,
+          message: "delete success",
+          data: '',
+        });
+      }
+    }).catch((err) => {
+      res.json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: err,
       });
+    });
   }
 }
 
