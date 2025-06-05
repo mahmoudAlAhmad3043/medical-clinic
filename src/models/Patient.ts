@@ -1,16 +1,12 @@
 import Patient from "../classes/Patient";
 import mongoose from "../config/db";
+import UserModel from "./User";
 
 
 const PatientSchema = new mongoose.Schema<Patient>({
-    patient_id: Number,
-    first_name: String,
-    last_name: String,
-    phone: String,
-    email: String,
-    age: Number
-})
+  age:{type:Number,required:true}
+});
 
-const PatientModel = mongoose.model<Patient>('patients',PatientSchema)
+const PatientModel = UserModel.discriminator('Patient', PatientSchema);
 
 export default PatientModel

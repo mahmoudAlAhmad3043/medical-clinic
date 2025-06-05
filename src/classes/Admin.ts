@@ -1,62 +1,62 @@
-import AdminModel from "../models/Admin"
-import {Time} from "../types"
+import { ObjectId } from "mongoose";
+import ServiceModel from "../models/Service";
+import { Time } from "../types";
+import User from "./User";
+import Service from "./Service";
 
-class Admin {
+class Admin extends User {
+  static admin: Admin | null = null;
+  open_time: Time;
+  close_time: Time;
 
-    static admin:Admin|null = null
-    first_name:string
-    last_name:string
-    username:string
-    email:string
-    password:string
-    open_time:Time
-    close_time:Time
-    device_ip:string
-    isVerified:boolean
+  constructor(
+    _id: string,
+    first_name: string,
+    last_name: string,
+    password: string,
+    email: string,
+    username: string,
+    phone: string,
+    device_id: string,
+    isVerified: boolean,
+    open_time: Time,
+    close_time: Time
+  ) {
+    super(
+      _id,
+      first_name,
+      last_name,
+      password,
+      email,
+      username,
+      phone,
+      device_id,
+      isVerified
+    );
+    this.open_time = open_time;
+    this.close_time = close_time;
+  }
 
-    constructor(first_name:string,last_name:string,username:string,email:string,password:string,open_time:Time,close_time:Time,device_ip:string,isVerified:boolean) {
-        this.first_name = first_name
-        this.last_name = last_name
-        this.username = username
-        this.email = email
-        this.password = password
-        this.open_time = open_time
-        this.close_time = close_time
-        this.device_ip = device_ip
-        this.isVerified = isVerified
-    }
+  static async addService(service: Omit<Service, "_id">) {
+    return await new ServiceModel(service).save();
+  }
 
-    static async getAdmin(username:string,device_ip:string) {
-        if(Admin.admin == null) {
-            Admin.admin = await AdminModel.findOne({username:username,device_ip:device_ip,isVerified:true})
-            return Admin.admin
-        }
-        else if(Admin.admin.username === username && Admin.admin.device_ip == device_ip && Admin.admin.isVerified) {
-            return Admin.admin
-        } else {
-            return null
-        }
-    }
-
-    static async setAdmin(admin: Admin) {
-        Admin.admin = null
-        let admins = await AdminModel.find()
-        if(admins.length) {
-            return null
-        } else {
-            let admin_ = new AdminModel(admin)
-            return await admin_.save()
-        }
-    }
-
-    static async deleteAdmin(username:string,device_ip:string) {
-        Admin.admin = null
-        return await AdminModel.deleteOne({username:username,device_ip:device_ip,isVerified:true})
-    }
-
-    static async verify(username:string) {
-        return await AdminModel.findOneAndUpdate({ username: username }, { isVerified: true },{ new: true })
-    }
+  // Delete
+  static async deleteService(id: ObjectId) {
+    return await ServiceModel.deleteOne({ _id: id });
+  }
+  // Update
+  static async updateService(service: Service) {
+    return await ServiceModel.updateOne(
+      { _id: service._id },
+      {
+        type: service.type,
+        description: service.description,
+        duration: service.duration,
+      },
+      { new: true }
+    );
+  }
 }
 
-export default Admin
+export default Admin;

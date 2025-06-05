@@ -51,7 +51,8 @@ export const sendVerificationEmail = (token:string,email:string) => {
     from: env.EMAIL_USER,
     to: email,
     subject: "Email Verification",
-    html: `<h3>Click to verify your email:</h3><a href="${url}">${url}</a>`
+    html: `<h3>Click to verify your email:</h3>
+              <a href="${url}" style="background:green;color:white;padding:8px;">Verify</a>`
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
@@ -71,5 +72,6 @@ export const getClientIp = (req: Request) => {
       ip = ip.replace('::ffff:', '');
     }
   }
+  console.log(ip)
  return ip
 }

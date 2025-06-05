@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import AdminClass from "../classes/Admin";
+import UserService from "../classes/UserService";
 import {env} from '../env'
 import { comparePassword, verifyAuthAdminToken, sendVerificationEmail } from "../utils";
 
 class Admin {
   static async signUp(req: Request, res: Response): Promise<void> {
-    AdminClass.setAdmin(req.body).then((data)=>{
+    UserService.setAdmin(req.body).then((data)=>{
       if(!data) {
         res.status(404).json({
           success: false,
@@ -34,7 +34,7 @@ class Admin {
   static async logIn(req: Request, res: Response): Promise<void> {
     const user = req.body
     const token = res.locals.token
-    AdminClass.getAdmin(user.username,user.device_ip).then(async (data)=>{
+    UserService.getAdmin(user.username,user.device_ip).then(async (data)=>{
       if(!data) {
         res.status(404).json({
           success: false,
@@ -77,7 +77,7 @@ class Admin {
         message: "No data",
       });
     }
-    AdminClass.verify(data.decoded.username).then((data)=>{
+    UserService.verify(data.decoded.username).then((data)=>{
       if(!data){
         res.status(404).json({
           success: false,
@@ -105,7 +105,7 @@ class Admin {
 
   static async deleteAdmin(req: Request, res: Response): Promise<void> {
     let data = res.locals.authData
-    AdminClass.deleteAdmin(data.decoded.username,data.decoded.device_ip).then(data=>{
+    UserService.deleteAdmin(data.decoded.username,data.decoded.device_ip).then(data=>{
       if(!data.deletedCount){
         res.status(404).json({
           success: false,

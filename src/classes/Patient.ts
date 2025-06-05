@@ -1,17 +1,11 @@
-class Patient {
-  patient_id:number
-  first_name: string
-  last_name: string
-  phone: string
-  email: string
+import User from "./User"
+
+class Patient extends User {
   age: number
 
-  constructor(patient_id:number,first_name:string,last_name:string,phone:string,email:string,age:number){
-    this.patient_id = patient_id;
-    this.first_name = first_name;
-    this.last_name = last_name;
-    this.phone = phone;
-    this.email = email;
+  constructor(age:number,_id:string,first_name:string,last_name:string,password:string,email:string,username:string,phone:string,device_id:string,isVerified:boolean){
+    super(_id,first_name,last_name,password,email,username,phone,device_id,isVerified)
+    this._id = _id;
     this.age = age;
   }
 }

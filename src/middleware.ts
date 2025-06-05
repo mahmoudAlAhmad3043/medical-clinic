@@ -2,10 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt'
 import { env }  from './env'
 import { getAuthAdminToken, getClientIp, getHeaderToken, verifyAuthAdminToken } from "./utils";
+import Admin from "./classes/Admin";
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   const admin = req.body;
-  if (typeof admin === "object" && admin.password && admin.username) {
+  if (admin.role === 'Admin') {
     next();
   } else{
     res.status(403).json({

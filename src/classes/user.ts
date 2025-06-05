@@ -1,29 +1,32 @@
-import  {Role}  from '../types'
-export default class User {
-    user_id:number;
+export class User {
+    _id:string;
     first_name:string;
-    middle_name:string;
     last_name:string;
+    username:string;
     password:string;
     email:string;
-    role:Role;
-    constructor(user_id:number,first_name:string,middle_name:string,last_name:string,password:string,email:string,role:Role){
-        this.user_id = user_id;
+    phone:string;
+    device_ip:string;
+    isVerified:boolean;
+    constructor(_id:string,first_name:string,last_name:string,password:string,email:string,username:string,phone:string,device_id:string,isVerified:boolean){
+        this._id = _id;
         this.first_name = first_name;
-        this.middle_name = middle_name;
         this.last_name = last_name;
         this.password = password;
         this.email = email;
-        this.role = role;
+        this.username = username;
+        this.phone = phone;
+        this.device_ip = device_id;
+        this.isVerified = isVerified;
     }
-    getUserId():number {
-        return this.user_id
+    getUserName(): string {
+        return this.username
+    }
+    getUserId():string  {
+        return this._id
     }
     getFirstName():string{
         return this.first_name;
-    }
-    getMiddleName():string{
-        return this.middle_name;
     }
     getLastName():string{
         return this.last_name;
@@ -34,17 +37,11 @@ export default class User {
     getEmail():string{
         return this.email;
     }
-    getRole():Role{
-        return this.role;
-    }
-    setUserId(user_id:number):void{
-        this.user_id = user_id;
+    setUserId(_id:string):void{
+        this._id = _id;
     }
     setFirstName(first_name:string):void{
         this.first_name = first_name;
-    }
-    setMiddleName(middle_name:string):void{
-        this.middle_name = middle_name;
     }
     setLastName(last_name:string):void{
         this.last_name = last_name;
@@ -55,8 +52,9 @@ export default class User {
     setEmail(email:string):void{
         this.email = email;
     }
-    setRole(role:Role):void{
-        this.role = role;
+    setUserName(username:string) {
+        this.username = username
     }
 }
 
+export default User
