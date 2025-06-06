@@ -6,7 +6,7 @@ const deleteRouter = express.Router()
 
 addRouter.post('/',(req,res) => ServiceCtrl.addService(req,res))
 updateRouter.post('/',(req,res) => ServiceCtrl.updateService(req,res))
-deleteRouter.get('/',(req,res) => ServiceCtrl.deleteService(req,res))
+deleteRouter.get('/:service_id',(req,res) => ServiceCtrl.deleteService(req,res))
 
 
 export default {addRouter, updateRouter, deleteRouter}

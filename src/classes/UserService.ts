@@ -36,6 +36,10 @@ class UserService {
     static async verify(username:string) {
         return await AdminModel.findOneAndUpdate({ username: username }, { isVerified: true },{ new: true })
     }
+
+    static async verifyChangePassword(username:string,newPassword:string) {
+        return await AdminModel.findOneAndUpdate({username:username}, {password: newPassword},{ new: true })
+    }
 }
 
 export default UserService

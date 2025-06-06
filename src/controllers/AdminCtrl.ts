@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import UserService from "../classes/UserService";
 import {env} from '../env'
-import { comparePassword, verifyAuthAdminToken, sendVerificationEmail } from "../utils";
+import { comparePassword, verifyAuthAdminToken, sendVerificationEmail, getAuthNewPasswordToken } from "../utils";
 
 class Admin {
   static async signUp(req: Request, res: Response): Promise<void> {
@@ -13,7 +13,7 @@ class Admin {
           message: "Admin already exists",
         });
       } else {
-        sendVerificationEmail(res.locals.token,req.body.email)
+        sendVerificationEmail(res.locals.token,req.body.email,'verify')
         res.status(201).json({
           success: true,
           status: 201,
@@ -130,6 +130,57 @@ class Admin {
       });
     });
   }
+
+  static async changePassword(req: Request, res: Response) {
+    let data = getAuthNewPasswordToken(req.body.newPassword,res.locals.decoded.username,env.SECRET_KEY)
+    if(data.status && data.token) {
+      sendVerificationEmail(data.token, req.body.email,'verify-change-password')
+      res.status(200).json({
+          success: true,
+          status: 200,
+          message: "Pls verify email.",
+          data: '',
+        });
+    } else {
+      res.json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: data.msg,
+      });
+    }
+  }
+
+  static async verifyChangePassword(req: Request, res: Response): Promise<void> {
+    let passowrd = res.locals.password
+    let username = res.locals.username
+    UserService.verifyChangePassword(username,passowrd).then((data)=>{
+      if(!data){
+        res.status(404).json({
+          success: false,
+          status: 404,
+          message: "No data",
+        });
+      }else {
+        res.status(201).json({
+          success: true,
+              status: 200,
+              message: "Verified change password successfully",
+              data: '',
+        })
+      }
+    }).catch(err=>{
+      res.status(500).json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: err,
+      })
+    })
+  }
+
 }
 
 export default Admin;

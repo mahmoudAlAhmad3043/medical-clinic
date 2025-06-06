@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Admin from "../classes/Admin";
+import { ObjectId } from "mongoose";
 
 class Service {
   static async addService(req: Request, res: Response): Promise<void> {
@@ -56,7 +57,8 @@ class Service {
   }
 
   static async deleteService(req: Request, res: Response): Promise<void> {
-    Admin.deleteService(req.body.service_id).then(data => {
+    let id:ObjectId|string = req.params.service_id
+    Admin.deleteService(id).then(data => {
       if(!data.deletedCount) {
         res.status(404).json({
           success: false,

@@ -34,6 +34,35 @@ export const hashPassword = async (req: Request, res: Response, next: NextFuncti
   })
 }
 
+export const hashNewPassword = async (req: Request, res: Response, next: NextFunction) => {
+  const data = verifyAuthAdminToken(req.params.token,env.SECRET_KEY)
+  if(data.status && data.decoded) {
+    const password = data.decoded.password
+    const username = data.decoded.username
+    await bcrypt.hash(password,10).then((hashPassword)=>{
+    res.locals.password = hashPassword
+    res.locals.username = username
+    next()
+    }).catch((err)=>{
+      res.status(500).json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: err,
+      });
+    })
+  } else {
+    res.status(500).json({
+        success: false,
+        status: 500,
+        message: "Something went wrong",
+        data: [],
+        error: 'error',
+      });
+  }
+}
+
 export const getAuthToken = (req: Request, res: Response, next: NextFunction) => {
   const data = getAuthAdminToken(req.body,env.SECRET_KEY)
   if(data.status) {
@@ -70,8 +99,7 @@ if(data.status) {
 export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   let token = getHeaderToken(req)
   let data = verifyAuthAdminToken(token,env.SECRET_KEY)
-  let checkIP = getClientIp(req) == data.decoded.device_ip
-  if(data.status && data.decoded && checkIP) {
+  if(data.status && data.decoded && (getClientIp(req) == data.decoded.device_ip)) {
       res.locals.authData = data
       next()
   }else {

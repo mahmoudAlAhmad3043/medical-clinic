@@ -13,6 +13,14 @@ export const getAuthAdminToken = (admin:Admin,secret:string) => {
   }
 }
 
+export const getAuthNewPasswordToken = (password:string,username:string,secret:string) => {
+  try{
+    return {token:jwt.sign({password:password,username:username},secret,{ expiresIn: '1h' }) , status:true}
+  }  catch {
+    return {token:null,msg:'Getting token error',status:false}
+  }
+}
+
 export const verifyAuthAdminToken = (token:string,secret:string): jwt.JwtPayload => {
   try{
     return {decoded:jwt.verify(token,secret) as jwt.JwtPayload,status:true};
@@ -38,7 +46,7 @@ export const getHeaderToken = (req:Request) => {
   return token
 }
 
-export const sendVerificationEmail = (token:string,email:string) => {
+export const sendVerificationEmail = (token:string,email:string,routeName:string) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -46,7 +54,7 @@ export const sendVerificationEmail = (token:string,email:string) => {
       pass: env.EMAIL_PASS
     }
   });
-  const url = `http://${env.IP}:${env.PORT}/verify/${token}`;
+  const url = `http://${env.IP}:${env.PORT}/${routeName}/${token}`;
   const mailOptions = {
     from: env.EMAIL_USER,
     to: email,

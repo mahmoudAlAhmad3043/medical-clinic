@@ -11,6 +11,6 @@
     "skipLibCheck": true,
     // "noPropertyAccessFromIndexSignature": true                         
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "docs.ts"],
   "exclude": ["node_modules"]
 }

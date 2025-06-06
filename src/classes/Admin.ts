@@ -42,7 +42,7 @@ class Admin extends User {
   }
 
   // Delete
-  static async deleteService(id: ObjectId) {
+  static async deleteService(id: ObjectId | string) {
     return await ServiceModel.deleteOne({ _id: id });
   }
   // Update
