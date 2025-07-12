@@ -6,7 +6,7 @@ interface User  {
 
 const UserSchema = new mongoose.Schema<User>({
     name: String
-})
+},{optimisticConcurrency: true})
 
 const UserModel = mongoose.model<User>('user', UserSchema)
 

@@ -5,12 +5,12 @@ import Admin from "./Admin";
 class UserService {
     static admin:Admin|null = null
 
-    static async getAdmin(username:string,device_ip:string) {
+    static async getAdmin(username:string) {
         if(Admin.admin == null) {
-            Admin.admin = await AdminModel.findOne({username:username,device_ip:device_ip,isVerified:true})
+            Admin.admin = await AdminModel.findOne({username:username,isVerified:true})
             return Admin.admin
         }
-        else if(Admin.admin.username === username && Admin.admin.device_ip == device_ip && Admin.admin.isVerified) {
+        else if(Admin.admin.username === username && Admin.admin.isVerified) {
             return Admin.admin
         } else {
             return null
@@ -28,9 +28,9 @@ class UserService {
         }
     }
 
-    static async deleteAdmin(username:string,device_ip:string) {
+    static async deleteAdmin(username:string,_id:string) {
         Admin.admin = null
-        return await AdminModel.deleteOne({username:username,device_ip:device_ip,isVerified:true})
+        return await AdminModel.deleteOne({username:username,_id:_id,isVerified:true})
     }
 
     static async verify(username:string) {

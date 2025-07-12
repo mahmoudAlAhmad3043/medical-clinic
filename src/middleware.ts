@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt'
 import { env }  from './env'
-import { getAuthAdminToken, getClientIp, getHeaderToken, verifyAuthAdminToken } from "./utils";
-import Admin from "./classes/Admin";
+import { getAuthAdminTokenSignUp,getAuthAdminTokenLogin, getClientIp, getHeaderToken, verifyAuthAdminToken } from "./utils";
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   const admin = req.body;
@@ -53,9 +52,9 @@ export const hashNewPassword = async (req: Request, res: Response, next: NextFun
       });
     })
   } else {
-    res.status(500).json({
+    res.status(401).json({
         success: false,
-        status: 500,
+        status: 401,
         message: "Something went wrong",
         data: [],
         error: 'error',
@@ -64,7 +63,7 @@ export const hashNewPassword = async (req: Request, res: Response, next: NextFun
 }
 
 export const getAuthToken = (req: Request, res: Response, next: NextFunction) => {
-  const data = getAuthAdminToken(req.body,env.SECRET_KEY)
+  const data = getAuthAdminTokenLogin(req.body,env.SECRET_KEY)
   if(data.status) {
     res.locals.token = data.token
     next()
@@ -81,7 +80,7 @@ export const getAuthToken = (req: Request, res: Response, next: NextFunction) =>
 
 export const VerificationCode = (req: Request, res: Response, next: NextFunction) => {
   req.body.isVerified = false
-  const data = getAuthAdminToken(req.body,env.SECRET_KEY)
+  const data = getAuthAdminTokenSignUp(req.body,env.SECRET_KEY)
 if(data.status) {
     res.locals.token = data.token
     next()
@@ -99,13 +98,13 @@ if(data.status) {
 export const isAuth = (req: Request, res: Response, next: NextFunction) => {
   let token = getHeaderToken(req)
   let data = verifyAuthAdminToken(token,env.SECRET_KEY)
-  if(data.status && data.decoded && (getClientIp(req) == data.decoded.device_ip)) {
+  if(data.status && data.decoded) {
       res.locals.authData = data
       next()
   }else {
-        res.status(404).json({
+        res.status(401).json({
         success: false,
-        status: 404,
+        status: 401,
         message: data.msg,
       });
     }

@@ -8,7 +8,7 @@ const VacationSchema = new mongoose.Schema<Vacation>({
   start_date: Date,
   duration: {type:Object} as unknown as Duration,
   description: String,
-});
+},{optimisticConcurrency: true});
 
 const VacationModel = mongoose.model<Vacation>("vacations", VacationSchema);
 

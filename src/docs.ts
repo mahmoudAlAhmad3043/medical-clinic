@@ -10,7 +10,7 @@ sign up route body:
     "phone":"",
     "open_time":"12:00:00 PM",
     "close_time":"12:00:00 PM",
-    "device_ip":"192.168.87.85"و
+    "device_ip":"192.168.87.85",
     "role":"Admin"
 }
 
@@ -31,7 +31,7 @@ add service :
 {
     "type": "",
     "description": "",
-    "duration": "{"days":3,"hours":2,"minuts":30}"
+    "duration": {"days":3,"hours":2,"minuts":30}
 }
 
 */

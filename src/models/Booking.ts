@@ -12,7 +12,7 @@ const BookingSchema = new mongoose.Schema<Booking>({
     service_id:{type:mongoose.Schema.Types.ObjectId, ref:'services'},
     booking_code:String,
     status:{type:String} as unknown as Status,
-})
+},{optimisticConcurrency: true})
 
 const BookingModel = mongoose.model<Booking>('bookings',BookingSchema)
 

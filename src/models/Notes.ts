@@ -5,7 +5,7 @@ import mongoose from "../config/db";
 const NotesSchema = new mongoose.Schema<Notes>({
     patient_id:{type:mongoose.Schema.Types.ObjectId, ref:'patients'},
     description:String
-})
+},{optimisticConcurrency: true})
 
 
 const NotesModel = mongoose.model<Notes>('notes',NotesSchema);

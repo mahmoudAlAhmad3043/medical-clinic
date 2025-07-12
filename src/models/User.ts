@@ -1,7 +1,7 @@
 import User from "../classes/User";
 import mongoose from "../config/db";
 
-const options = { discriminatorKey: 'role', collection: 'users' };
+const options = { discriminatorKey: 'role', collection: 'users', optimisticConcurrency: true };
 
 const UserSchema = new mongoose.Schema<User>({
     first_name:{type:String,required:true},

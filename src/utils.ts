@@ -4,10 +4,20 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import { env }  from './env'
 import nodemailer from 'nodemailer'
+import say from 'say'
+import { rejects } from 'assert'
 
-export const getAuthAdminToken = (admin:Admin,secret:string) => {
+export const getAuthAdminTokenSignUp = (admin:Admin,secret:string) => {
   try{
-    return {token:jwt.sign({username:admin.username,device_ip:admin.device_ip},secret,{ expiresIn: '1h' }) , status:true}
+    return {token:jwt.sign({username:admin.username,email:admin.email,role:'Admin'},secret,{ expiresIn: '1h' }) , status:true}
+  }  catch {
+    return {token:null,msg:'Getting token error',status:false}
+  }
+}
+
+export const getAuthAdminTokenLogin = (admin:Admin,secret:string) => {
+  try{
+    return {token:jwt.sign({username:admin.username,email:admin.email,role:'Admin',_id:admin._id},secret,{ expiresIn: '1h' }) , status:true}
   }  catch {
     return {token:null,msg:'Getting token error',status:false}
   }
@@ -83,3 +93,5 @@ export const getClientIp = (req: Request) => {
   console.log(ip)
  return ip
 }
+
+export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
