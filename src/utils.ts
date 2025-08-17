@@ -4,8 +4,7 @@ import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import { env }  from './env'
 import nodemailer from 'nodemailer'
-import say from 'say'
-import { rejects } from 'assert'
+import redis from './redis'
 
 export const getAuthAdminTokenSignUp = (admin:Admin,secret:string) => {
   try{
@@ -36,6 +35,30 @@ export const verifyAuthAdminToken = (token:string,secret:string): jwt.JwtPayload
     return {decoded:jwt.verify(token,secret) as jwt.JwtPayload,status:true};
   } catch {
     return {decoded:null,msg:'Verification token error',status:false}
+  }
+}
+
+export const verifyAuthAdminSingUpToken = async (
+  token: string,
+  secret: string
+):  Promise<any> => {
+  try {
+    const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
+    console.log("decoded data = ", decoded);
+
+    if (decoded && decoded.username) {
+      const storedToken = await redis.get(`signUpToken:${decoded.username}`);
+
+      if (!storedToken || token !== storedToken) {
+        return { decoded: null, msg: "Verification token error", status: false };
+      }
+
+      return { decoded:decoded, status: true };
+    }
+
+    return { decoded: null, msg: "Invalid token payload", status: false };
+  } catch {
+    return { decoded: null, msg: "Verification token error", status: false };
   }
 }
 

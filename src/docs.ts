@@ -1,3 +1,9 @@
+// redis for blackList tokens in node.js
+// Token Versioning when log-out user  ---
+// express-rate-limit 
+// node-cache 
+// Indexing in MongoDB ---
+
 
 /*
 sign up route body:

@@ -3,12 +3,13 @@ import UserService from "../classes/UserService";
 import { env } from "../env";
 import {
   comparePassword,
-  verifyAuthAdminToken,
+  verifyAuthAdminSingUpToken,
   sendVerificationEmail,
   getAuthNewPasswordToken,
   getAuthAdminTokenLogin,
 } from "../utils";
 import { Speaker } from "../classes/Speaker";
+import redis from "../redis";
 
 class Admin {
   static async signUp(req: Request, res: Response): Promise<void> {
@@ -93,23 +94,25 @@ class Admin {
       });
   }
   static async verify(req: Request, res: Response): Promise<void> {
-    const data = verifyAuthAdminToken(req.params.token, env.SECRET_KEY);
-    if (!data.status) {
+    verifyAuthAdminSingUpToken(req.params.token, env.SECRET_KEY).
+    then(data => {
+      if (!data.status) {
       res.status(401).json({
         success: false,
         status: 401,
         message: data.msg,
       });
-    }
-    UserService.verify(data.decoded.username)
-      .then((data) => {
-        if (!data) {
+    } else {
+      UserService.verify(data.decoded.username)
+      .then((data1) => {
+        if (!data1) {
           res.status(404).json({
             success: false,
             status: 404,
             message: "No data",
           });
         } else {
+          redis.del(`signUpToken:${data.decoded.username}`)
           res.status(200).json({
             success: true,
             status: 200,
@@ -127,6 +130,16 @@ class Admin {
           error: err,
         });
       });
+    }
+    }).catch(err=> {
+      res.status(500).json({
+          success: false,
+          status: 500,
+          message: "Something went wrong",
+          data: [],
+          error: err,
+        });
+    })
   }
 
   static async deleteAdmin(req: Request, res: Response): Promise<void> {

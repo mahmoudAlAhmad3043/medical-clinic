@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import bcrypt from 'bcrypt'
 import { env }  from './env'
 import { getAuthAdminTokenSignUp,getAuthAdminTokenLogin, getClientIp, getHeaderToken, verifyAuthAdminToken } from "./utils";
+import redis from "./redis";
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   const admin = req.body;
@@ -83,6 +84,7 @@ export const VerificationCode = (req: Request, res: Response, next: NextFunction
   const data = getAuthAdminTokenSignUp(req.body,env.SECRET_KEY)
 if(data.status) {
     res.locals.token = data.token
+    redis.set(`signUpToken:${req.body.username}`,data.token,"EX",15 * 60)
     next()
   }else  {
     res.status(500).json({
